@@ -4,7 +4,7 @@ import fs from 'fs';
 import os from 'os';
 import path from 'path';
 
-// ESM-compatible module mocking — must be set up before importing the tool.
+// ESM-compatible module mocking â€” must be set up before importing the tool.
 jest.unstable_mockModule('../../../src/clients/quickbooks-client', () => ({
   quickbooksClient: mockQuickbooksClient,
   QuickbooksClient: mockQuickbooksClientClass,
@@ -134,7 +134,7 @@ describe('GetInvoicePdfTool', () => {
       const sibling = fs.mkdtempSync(path.join(os.tmpdir(), 'qbo-pdf-tool-symlink-target-'));
       const linkPath = path.join(tmpRoot, 'link');
       try {
-        fs.symlinkSync(sibling, linkPath);
+        fs.symlinkSync(sibling, linkPath, process.platform === 'win32' ? 'junction' : 'dir');
         const result = await handler({ invoice_id: '1', output_path: 'link/escape.pdf' });
         expect(result.content[0].text).toMatch(/resolves outside QBO_PDF_OUTPUT_DIR/);
       } finally {
@@ -226,3 +226,4 @@ describe('GetInvoicePdfTool', () => {
     });
   });
 });
+
