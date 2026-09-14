@@ -12,7 +12,7 @@ import path from "path";
 
 // Extension -> MIME map limited to the file types QBO's /upload endpoint
 // accepts. Values intentionally mirror QBO's documented (sometimes
-// non-RFC-standard) spellings â€” see ALLOWED_UPLOAD_CONTENT_TYPES in
+// non-RFC-standard) spellings — see ALLOWED_UPLOAD_CONTENT_TYPES in
 // create-quickbooks-attachable.handler.ts, which this map must stay a
 // subset of.
 const EXT_TO_MIME: Record<string, string> = {
@@ -51,14 +51,14 @@ export function inferContentType(...candidateNames: Array<string | undefined>): 
   return null;
 }
 
-// â”€â”€ file_path source â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── file_path source ──────────────────────────────────────────────────────
 
 // The server shares a filesystem with its callers (it runs as a local stdio
-// subprocess), so OS-native absolute paths are legitimate input â€” but they
+// subprocess), so OS-native absolute paths are legitimate input — but they
 // must stay inside an allowed base directory. Defaults: the user's profile
 // directory and the OS temp directory (which together cover OneDrive/
 // SharePoint sync roots, Downloads, and agent scratchpad dirs on a standard
-// Windows setup). Override with QUICKBOOKS_ATTACHABLE_BASE_DIR â€” accepts
+// Windows setup). Override with QUICKBOOKS_ATTACHABLE_BASE_DIR — accepts
 // multiple directories separated by ";" (Windows PATH style).
 function allowedBaseDirs(): string[] {
   const raw = process.env.QUICKBOOKS_ATTACHABLE_BASE_DIR;
@@ -72,7 +72,7 @@ function allowedBaseDirs(): string[] {
 }
 
 // Windows paths are case-insensitive; normalize before containment checks.
-/* istanbul ignore next â€” platform branch: only one arm is reachable per OS */
+/* istanbul ignore next — platform branch: only one arm is reachable per OS */
 function normalizeForCompare(p: string): string {
   return process.platform === "win32" ? p.toLowerCase() : p;
 }
@@ -143,7 +143,7 @@ export async function resolveLocalFile(filePath: string, maxBytes: number): Prom
     try {
       baseReal = await fs.realpath(path.resolve(dir));
     } catch {
-      continue; // configured base dir doesn't exist â€” skip it
+      continue; // configured base dir doesn't exist — skip it
     }
     basesChecked.push(baseReal);
     const rel = path.relative(normalizeForCompare(baseReal), normalizeForCompare(targetReal));
@@ -170,7 +170,7 @@ export async function resolveLocalFile(filePath: string, maxBytes: number): Prom
   return { path: targetReal, size: stat.size };
 }
 
-// â”€â”€ file_url source â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── file_url source ───────────────────────────────────────────────────────
 
 // SSRF guard: reject loopback, RFC1918/4193 private ranges, link-local
 // (incl. 169.254.169.254 cloud metadata), CGNAT, and unspecified addresses.
@@ -271,7 +271,7 @@ export async function fetchUrlToTempFile(fileUrl: string, maxBytes: number): Pro
       if (!location) throw new Error(`file_url redirect (${res.status}) missing Location header`);
       if (hop === 3) throw new Error(`file_url exceeded 3 redirects`);
       current = new URL(location, current);
-      // Cancel the redirect body without reading it â€” a hostile server could
+      // Cancel the redirect body without reading it — a hostile server could
       // attach an arbitrarily large body to a 3xx.
       await res.body?.cancel().catch(swallow);
       continue;
@@ -280,7 +280,7 @@ export async function fetchUrlToTempFile(fileUrl: string, maxBytes: number): Pro
     response = res;
     break;
   }
-  /* istanbul ignore next â€” defensive: the redirect loop always breaks with a
+  /* istanbul ignore next — defensive: the redirect loop always breaks with a
      response or throws before exhausting its iterations */
   if (!response) throw new Error(`file_url fetch returned no response`);
   if (!response.body) throw new Error(`file_url fetch returned no body`);
@@ -330,4 +330,3 @@ export async function fetchUrlToTempFile(fileUrl: string, maxBytes: number): Pro
     cleanup,
   };
 }
-
