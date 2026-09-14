@@ -2,7 +2,7 @@
  * Behavioral tests for saveTokensToEnv symlink handling.
  *
  * Exercises the real QuickbooksClient.saveTokensToEnv logic via the public
- * authenticate() → refreshAccessToken() path, using jest.unstable_mockModule
+ * authenticate() â†’ refreshAccessToken() path, using jest.unstable_mockModule
  * to control fs behavior. Mirrors the pattern from quickbooks-client.auth.test.ts.
  *
  * Covers:
@@ -12,6 +12,7 @@
  * 4. isSymbolicLink: fails closed (returns false) on any fs error.
  */
 import { jest } from '@jest/globals';
+import path from 'path';
 
 process.env.QUICKBOOKS_CLIENT_ID = 'test-client-id';
 process.env.QUICKBOOKS_CLIENT_SECRET = 'test-client-secret';
@@ -138,7 +139,7 @@ describe('saveTokensToEnv (via authenticate)', () => {
   it('handles dangling symlink with an ABSOLUTE target via readlinkSync fallback', async () => {
     lstatBehavior = 'symlink';
     realpathBehavior = 'enoent';
-    readlinkTarget = LINK_TARGET; // absolute — used as-is
+    readlinkTarget = LINK_TARGET; // absolute â€” used as-is
 
     await quickbooksClient.authenticate();
 
@@ -165,8 +166,8 @@ describe('saveTokensToEnv (via authenticate)', () => {
     // and is absolute (not the bare relative string, and not cwd-relative).
     const writtenPath = writeFileSyncSpy.mock.calls[writeFileSyncSpy.mock.calls.length - 1][0] as string;
     expect(writtenPath).not.toBe('../data/.env'); // not written verbatim
-    expect(writtenPath.startsWith('/')).toBe(true); // absolute
-    expect(writtenPath.endsWith('/data/.env')).toBe(true); // resolved to link dir's sibling
+    expect(path.isAbsolute(writtenPath)).toBe(true);
+    expect(writtenPath.endsWith(path.join('data', '.env'))).toBe(true);
   });
 
   it('falls back to atomic rename when lstatSync throws (isSymbolicLink fails closed)', async () => {
@@ -174,7 +175,7 @@ describe('saveTokensToEnv (via authenticate)', () => {
 
     await quickbooksClient.authenticate();
 
-    // isSymbolicLink returns false on error → uses the rename path
+    // isSymbolicLink returns false on error â†’ uses the rename path
     expect(renameSyncSpy).toHaveBeenCalled();
   });
 
@@ -187,3 +188,4 @@ describe('saveTokensToEnv (via authenticate)', () => {
     await expect(quickbooksClient.authenticate()).resolves.not.toThrow();
   });
 });
+
