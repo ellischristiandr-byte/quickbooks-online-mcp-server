@@ -2,7 +2,7 @@
  * Behavioral tests for saveTokensToEnv symlink handling.
  *
  * Exercises the real QuickbooksClient.saveTokensToEnv logic via the public
- * authenticate() â†’ refreshAccessToken() path, using jest.unstable_mockModule
+ * authenticate() → refreshAccessToken() path, using jest.unstable_mockModule
  * to control fs behavior. Mirrors the pattern from quickbooks-client.auth.test.ts.
  *
  * Covers:
@@ -139,7 +139,7 @@ describe('saveTokensToEnv (via authenticate)', () => {
   it('handles dangling symlink with an ABSOLUTE target via readlinkSync fallback', async () => {
     lstatBehavior = 'symlink';
     realpathBehavior = 'enoent';
-    readlinkTarget = LINK_TARGET; // absolute â€” used as-is
+    readlinkTarget = LINK_TARGET; // absolute — used as-is
 
     await quickbooksClient.authenticate();
 
@@ -175,7 +175,7 @@ describe('saveTokensToEnv (via authenticate)', () => {
 
     await quickbooksClient.authenticate();
 
-    // isSymbolicLink returns false on error â†’ uses the rename path
+    // isSymbolicLink returns false on error → uses the rename path
     expect(renameSyncSpy).toHaveBeenCalled();
   });
 
@@ -188,4 +188,3 @@ describe('saveTokensToEnv (via authenticate)', () => {
     await expect(quickbooksClient.authenticate()).resolves.not.toThrow();
   });
 });
-
