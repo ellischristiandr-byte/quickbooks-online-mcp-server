@@ -76,7 +76,7 @@ let callbackHandler:
   | undefined;
 const fakeServer = {
   listen: jest.fn((_port: unknown, _host: unknown, cb?: () => void) => {
-    if (cb) setImmediate(cb);
+    if (cb) cb();
     return fakeServer;
   }),
   close: jest.fn(),
@@ -116,10 +116,8 @@ async function untilCallbackRegistered(timeoutMs = 2000): Promise<void> {
   }
 }
 
-// server.listen()'s callback (where authorizeUri() is called) runs on a
-// setImmediate scheduled AFTER http.createServer() already set callbackHandler
-// synchronously, so untilCallbackRegistered() alone can resolve before
-// authorizeUri() has actually been invoked. Poll for that call separately.
+// Poll separately for authorizeUri() so this helper remains valid if the
+// listen mock later becomes asynchronous.
 async function untilAuthorizeUriCalled(client: MockOAuth, timeoutMs = 2000): Promise<void> {
   const start = Date.now();
   while (client.authorizeUri.mock.calls.length === 0) {
@@ -167,7 +165,7 @@ describe('QuickbooksClient.authenticate', () => {
     const flowClient = oauthInstances[1];
     expect(flowClient.cfg.redirectUri).toBe('http://localhost:8000/callback');
 
-    // The state actually used is a random per-run value, not a fixed literal —
+    // The state actually used is a random per-run value, not a fixed literal â€”
     // read it off the authorizeUri() call so the simulated callback matches it.
     await untilAuthorizeUriCalled(flowClient);
     const { state } = (flowClient.authorizeUri.mock.calls[0][0] as { state: string; scope: string[] });
@@ -198,13 +196,13 @@ describe('QuickbooksClient.authenticate', () => {
     // rather than immediately observing the previous test's leftover value.
     callbackHandler = undefined;
 
-    // Don't await — the flow is left waiting for a (never-arriving) valid callback.
+    // Don't await â€” the flow is left waiting for a (never-arriving) valid callback.
     void quickbooksClient.authenticate().catch(() => {});
 
     await untilCallbackRegistered();
 
-    // Someone hitting the callback with a guessed/spoofed or stale state —
-    // e.g. a replayed URL, or another concurrent auth attempt — must be
+    // Someone hitting the callback with a guessed/spoofed or stale state â€”
+    // e.g. a replayed URL, or another concurrent auth attempt â€” must be
     // rejected with 400, and the code must never reach createToken().
     const res = { writeHead: jest.fn(), end: jest.fn() };
     await callbackHandler!({ url: '/callback?code=abc&state=not-the-real-state', method: 'GET' }, res);
@@ -213,3 +211,4 @@ describe('QuickbooksClient.authenticate', () => {
     expect(createTokenDispatch).not.toHaveBeenCalled();
   });
 });
+
