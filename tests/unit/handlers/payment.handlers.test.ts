@@ -1,4 +1,4 @@
-import { jest, describe, it, expect, beforeEach, beforeAll } from '@jest/globals';
+import { jest, describe, it, expect, beforeEach } from '@jest/globals';
 import { mockQuickbooksClient, mockQuickbooksClientClass, mockQuickBooksInstance, resetAllMocks } from '../../mocks/quickbooks.mock';
 
 // ESM-compatible module mocking
@@ -73,7 +73,7 @@ describe('Payment Handlers', () => {
 
     it('should map reference number and multicurrency fields onto the QBO payload', async () => {
       // Capture the payload the handler builds so we can assert the new
-      // PaymentRefNum / CurrencyRef / ExchangeRate fields are wired through —
+      // PaymentRefNum / CurrencyRef / ExchangeRate fields are wired through â€”
       // these previously had no schema entry and were silently dropped.
       let capturedPayload: any = null;
       (mockQuickBooksInstance.createPayment as jest.Mock).mockImplementation(
