@@ -4,7 +4,7 @@ import fs from 'fs';
 import os from 'os';
 import path from 'path';
 
-// ESM-compatible module mocking â€” must be set up before importing the tool.
+// ESM-compatible module mocking — must be set up before importing the tool.
 jest.unstable_mockModule('../../../src/clients/quickbooks-client', () => ({
   quickbooksClient: mockQuickbooksClient,
   QuickbooksClient: mockQuickbooksClientClass,
@@ -226,4 +226,3 @@ describe('GetInvoicePdfTool', () => {
     });
   });
 });
-
