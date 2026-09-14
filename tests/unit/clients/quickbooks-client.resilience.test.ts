@@ -8,7 +8,7 @@
  *    Intuit invalidates the previous refresh token on every rotation. The
  *    client refreshes with its in-memory token first and only consults .env
  *    AFTER that token is rejected, retrying once with a sibling's freshly
- *    persisted token â€” so a valid in-memory token (including one just rotated
+ *    persisted token — so a valid in-memory token (including one just rotated
  *    but not yet persisted) is never discarded.
  * 2. In production, a genuinely dead refresh token fails with an actionable
  *    "re-authorize" error rather than opening the interactive localhost OAuth
@@ -37,7 +37,7 @@ jest.unstable_mockModule('dotenv', () => ({
         if (!m) continue;
         let v = (m[2] ?? '').trim();
         // A quoted value at the start wins; trailing content (e.g. a comment
-        // after the closing quote) is ignored â€” matching dotenv.
+        // after the closing quote) is ignored — matching dotenv.
         const quoted = v.match(/^(['"`])((?:\\.|[^\\])*?)\1/);
         if (quoted) v = quoted[2];
         else v = v.split(' #')[0].trim(); // strip inline comment (unquoted only)
@@ -166,7 +166,7 @@ describe('multi-process rotation race', () => {
   it('does not consult .env when the in-memory token is valid (never discards a good token)', async () => {
     // Regression guard: disk holds a STALE token (a prior persist failed), but
     // the in-memory token is valid. The refresh must use memory and not touch
-    // disk â€” the pre-review bug adopted disk unconditionally and locked out a
+    // disk — the pre-review bug adopted disk unconditionally and locked out a
     // company whose valid token was in memory.
     const client = makeClient({ refreshToken: 'valid-in-memory-T2' });
     fsReadFileSync.mockReturnValue(envWithToken('stale-disk-T1'));
@@ -333,7 +333,7 @@ describe('sandbox transient handling', () => {
 
     const msg = await messageOf(client.authenticate());
     expect(msg).toMatch(/Failed to refresh Quickbooks token/);
-    expect(serverCreated).toBe(false); // no doomed/â€‹spurious browser flow
+    expect(serverCreated).toBe(false); // no doomed/​spurious browser flow
     expect(openMock).not.toHaveBeenCalled();
     expect(tokenOf(client)).toBe('valid-sbx'); // token NOT discarded
   });
@@ -357,4 +357,3 @@ describe('sandbox transient handling', () => {
     expect(serverCreated).toBe(true);
   });
 });
-
