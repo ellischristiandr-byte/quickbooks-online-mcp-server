@@ -73,7 +73,7 @@ describe('Payment Handlers', () => {
 
     it('should map reference number and multicurrency fields onto the QBO payload', async () => {
       // Capture the payload the handler builds so we can assert the new
-      // PaymentRefNum / CurrencyRef / ExchangeRate fields are wired through â€”
+      // PaymentRefNum / CurrencyRef / ExchangeRate fields are wired through —
       // these previously had no schema entry and were silently dropped.
       let capturedPayload: any = null;
       (mockQuickBooksInstance.createPayment as jest.Mock).mockImplementation(
@@ -308,5 +308,4 @@ describe('Payment Handlers', () => {
     });
   });
 });
-
 
